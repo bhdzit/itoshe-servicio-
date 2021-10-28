@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_login/home.dart';
+import 'login.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
-void main() => runApp(configuracion());
+void main() => runApp(registro());
 
-class configuracion extends StatelessWidget {
+class registro extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final appTitle = 'Configuracion';
+    final appTitle = 'Registrarse';
 
     return MaterialApp(
       title: appTitle,
       home: Scaffold(
+        appBar: AppBar(
+          title: Text(appTitle),
+          backgroundColor: const Color(0xff00C853),
+        ),
         body: MyCustomForm(),
       ),
     );
@@ -32,14 +38,15 @@ class MyCustomForm extends StatefulWidget {
 // el formulario.
 class MyCustomFormState extends State<MyCustomForm> {
   bool visible = false;
+
+  // Getting value from TextField widget.
+  final nameController = TextEditingController();
+  final apellidoPcontroller = TextEditingController();
+  final apellidoMcontroller = TextEditingController();
+  final nombreUcontroller = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  // Crea una clave global que identificará de manera única el widget Form
-  // y nos permita validar el formulario
-  //
-  // Nota: Esto es un GlobalKey<FormState>, no un GlobalKey<MyCustomFormState>!
-  final _formKey = GlobalKey<FormState>();
-  bool isHiddenPassword = true;
+
   Future userRegistration() async {
     // Showing CircularProgressIndicator.
     setState(() {
@@ -47,13 +54,21 @@ class MyCustomFormState extends State<MyCustomForm> {
     });
 
     // Getting value from Controller
+    String nombreB = nameController.text;
+    String apellidoPaternoB = apellidoPcontroller.text;
+    String apellidoMaternoB = apellidoMcontroller.text;
+    String nombreUsuarioB = nombreUcontroller.text;
     String emailB = emailController.text;
     String passwordUB = passwordController.text;
     // SERVER API URL
-    var url = 'https://centrodeinformacion.host/php/editarI.php';
+    var url = 'https://centrodeinformacion.host/php/agregarI.php';
 
     // Store all data with Param Name.
     var data = {
+      "nombre": nombreB,
+      "apellidoPaterno": apellidoPaternoB,
+      "apellidoMaterno": apellidoMaternoB,
+      "nombreUsuario": nombreUsuarioB,
       "email": emailB,
       "passwordU": passwordUB,
     };
@@ -81,7 +96,10 @@ class MyCustomFormState extends State<MyCustomForm> {
             FlatButton(
               child: new Text("OK"),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => registro()),
+                );
               },
             ),
           ],
@@ -89,6 +107,13 @@ class MyCustomFormState extends State<MyCustomForm> {
       },
     );
   }
+
+  bool isHiddenPassword = true;
+  // Crea una clave global que identificará de manera única el widget Form
+  // y nos permita validar el formulario
+  //
+  // Nota: Esto es un GlobalKey<FormState>, no un GlobalKey<MyCustomFormState>!
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +125,61 @@ class MyCustomFormState extends State<MyCustomForm> {
           padding: EdgeInsets.all(20.0),
           margin: EdgeInsets.all(20.0),
           decoration:
-          BoxDecoration(border: Border.all(color: Color(0xff00C853))),
+              BoxDecoration(border: Border.all(color: Color(0xff00C853))),
           child: Form(
             key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                Padding(
+                  child: new Text('Nombre'),
+                  padding: const EdgeInsets.all(1.0),
+                ),
+                TextFormField(
+                  controller: nameController,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'No Puede Dejar Campos Vacios';
+                    }
+                  },
+                  //decoration: InputDecoration(hintText: 'Nombre'),
+                ),
+                Padding(
+                  child: new Text('Apellido Paterno'),
+                  padding: const EdgeInsets.all(1.0),
+                ),
+                TextFormField(
+                  controller: apellidoPcontroller,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'No Puede Dejar Campos Vacios';
+                    }
+                  },
+                ),
+                Padding(
+                  child: new Text('Apellido Materno'),
+                  padding: const EdgeInsets.all(1.0),
+                ),
+                TextFormField(
+                  controller: apellidoMcontroller,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'No Puede Dejar Campos Vacios';
+                    }
+                  },
+                ),
+                Padding(
+                  child: new Text('Usuario'),
+                  padding: const EdgeInsets.all(1.0),
+                ),
+                TextFormField(
+                  controller: nombreUcontroller,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'No Puede Dejar Campos Vacios';
+                    }
+                  },
+                ),
                 Padding(
                   child: new Text('Correo'),
                   padding: const EdgeInsets.all(1.0),
@@ -114,7 +188,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                   controller: emailController,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'Agregar Correo';
+                      return 'No Puede Dejar Campos Vacios';
                     }
                   },
                 ),
@@ -123,13 +197,13 @@ class MyCustomFormState extends State<MyCustomForm> {
                   padding: const EdgeInsets.all(1.0),
                 ),
                 TextFormField(
-                  controller: passwordController,
-                  obscureText: isHiddenPassword,
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'Agregar Contraseña';
+                      return 'No Puede Dejar Campos Vacios';
                     }
                   },
+                  controller: passwordController,
+                  obscureText: isHiddenPassword,
                   decoration: InputDecoration(
                     suffixIcon: InkWell(
                         onTap: _togglePassView, child: Icon(Icons.visibility)),
@@ -145,16 +219,29 @@ class MyCustomFormState extends State<MyCustomForm> {
                         // devolverá true si el formulario es válido, o falso si
                         // el formulario no es válido.
                         if (_formKey.currentState!.validate()) {
-                          userRegistration();
                           // Si el formulario es válido, queremos mostrar un Snackbar
-                          Scaffold.of(context).showSnackBar(SnackBar(
-                              content: Text('Procesando la Información')));
+                          userRegistration();
                         }
                       },
-                      child: Text('Cambiar Contraseña '),
+                      child: Text('Registrarse '),
                     ),
                   ),
                 ),
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: RaisedButton(
+                      color: Color(0xff00C853),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginApp()),
+                        );
+                      },
+                      child: Text('Volver '),
+                    ),
+                  ),
+                )
               ],
             ),
           ),
