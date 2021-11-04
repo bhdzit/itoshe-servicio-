@@ -4,6 +4,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'package:http/http.dart' show get;
 import 'dart:convert';
 
@@ -124,7 +126,7 @@ class CustomListView extends StatelessWidget {
           //screen with a platform-adaptive transition.
           var route = new MaterialPageRoute(
             builder: (BuildContext context) =>
-                new SecondScreen(value: spacecraft),
+            new SecondScreen(value: spacecraft),
           );
           //A Navigator is a widget that manages a set of child widgets with
           //stack discipline.It allows us navigate pages.
@@ -135,17 +137,18 @@ class CustomListView extends StatelessWidget {
 
 //Future is n object representing a delayed computation.
 Future<List<Spacecraft>> downloadJSON() async {
-  const jsonEndpoint = "https://centrodeinformacion.host/php/inmateriales.php";
+  try {
+    const jsonEndpoint =
+        "https://centrodeinformacion.host/php/inmateriales.php";
 
-  final response = await get(Uri.parse(jsonEndpoint));
-
-  if (response.statusCode == 200) {
+    final response = await get(Uri.parse(jsonEndpoint));
     List spacecrafts = json.decode(response.body);
     return spacecrafts
         .map((spacecraft) => new Spacecraft.fromJson(spacecraft))
         .toList();
-  } else
+  } catch (e) {
     throw Exception('Revise su Conexiòn');
+  }
 }
 
 class SecondScreen extends StatefulWidget {
@@ -158,6 +161,24 @@ class SecondScreen extends StatefulWidget {
 }
 
 class _SecondScreenState extends State<SecondScreen> {
+  late GoogleMapController mapController;
+  final Map<String, Marker> _markers = {};
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+    setState(() {
+      final marker = Marker(
+        markerId: MarkerId('${widget.value.Nombre}'),
+        position: LatLng(double.parse('${widget.value.Latitud}'),
+            double.parse('${widget.value.Longitud}')),
+        infoWindow: InfoWindow(
+          title: 'Nombre:${widget.value.Nombre}',
+          snippet: 'Ubicacion : ${widget.value.Ubicacion}',
+        ),
+      );
+      _markers['${widget.value.Nombre}'] = marker;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -227,6 +248,18 @@ class _SecondScreenState extends State<SecondScreen> {
                   textAlign: TextAlign.justify,
                 ),
                 padding: const EdgeInsets.all(20.0),
+              ),
+              Container(
+                height: 500,
+                child: GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(double.parse('${widget.value.Latitud}'),
+                        double.parse('${widget.value.Longitud}')),
+                    zoom: 11.0,
+                  ),
+                  markers: _markers.values.toSet(),
+                ),
               )
             ],
           ),

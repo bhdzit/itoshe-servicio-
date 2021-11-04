@@ -10,7 +10,7 @@ import 'Inicio.dart';
 import 'inmaterial.dart';
 import 'natural.dart';
 import 'ruta.dart';
-import 'salir.dart';
+
 import 'login.dart';
 
 class Home extends StatefulWidget {
@@ -41,8 +41,6 @@ class _HomeState extends State<Home> {
         return configuracion();
       case 8:
         return contacto();
-      case 9:
-        return salir();
         break;
       default:
     }
@@ -190,7 +188,7 @@ class _HomeState extends State<Home> {
               leading: Icon(Icons.exit_to_app),
               selected: (9 == _selectDrawerItem),
               onTap: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => LoginApp()),
                 );

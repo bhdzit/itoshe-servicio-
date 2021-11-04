@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_login/Inicio.dart';
 import 'package:flutter_login/home.dart';
 import 'package:flutter_login/main.dart';
-import 'package:flutter_login/registro.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -109,8 +108,8 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     // ignore: prefer_const_constructors
-    return WillPopScope(
-      onWillPop: _willPopCallback,
+    return new WillPopScope(
+      onWillPop: () async => false,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
