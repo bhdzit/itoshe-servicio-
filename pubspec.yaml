@@ -38,7 +38,8 @@ dependencies:
   json_annotation: ^4.3.0
   # add this line to your dependencies
   fluttertoast: ^8.0.8
-
+  syncfusion_flutter_calendar: ^18.2.44
+  google_maps_flutter: ^2.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -92,3 +93,5 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+
